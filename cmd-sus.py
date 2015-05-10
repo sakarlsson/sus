@@ -19,6 +19,13 @@ def register(name, host, port, protocol, version, timeout=10):
     # print stdout
 
 
+def run(args, env, stdin):
+    print args
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (stdout,stderr) = p.communicate()
+    rc = p.returncode
+    return (stdout, stderr, rc)
+
 class MyTCPServer(SocketServer.ThreadingTCPServer):
     allow_reuse_address = True
 
@@ -38,12 +45,18 @@ class MyTCPServerHandler(SocketServer.BaseRequestHandler):
 
         try:
             # process the data, i.e. print it:
-            x = json.loads(data)
-            print x
-            # send some 'ok' back
-            self.request.sendall(json.dumps({'return':'ok'}))
+            cmdmessage = json.loads(data)
+            cmdargs = cmdmessage['args']
+            stdin = cmdmessage['stdin']
+            print cmdargs
+            print stdin
+            (stdout, stderr, status) = run(["ls"] + cmdargs[1:], "", stdin)
+            print "O %s %d" % (stdout, status)
+            self.request.sendall(json.dumps({'status':status, 'stdout':stdout, 'stderr':stderr}))
         except Exception, e:
-            print "Exception wile receiving message: ", e
+            print "Exception while receiving message: ", e
+
+
 
 register("glugger", socket.gethostname(), 13373, "cmd", "0.0.1")
 

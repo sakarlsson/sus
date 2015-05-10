@@ -22,22 +22,20 @@ def lookup(registry, name):
 
 
 def main():
-    parser = OptionParser(__doc__)
-    parser.add_option("-r", "--registry", dest="registry", default="localhost:6379",
-                      help="registry")
-    (options, args) = parser.parse_args()
+    registry = os.environ['SUSREG']
+    (host,port,protocol,version) = lookup(registry, sys.argv[1])
 
-    print args[0]
-    (host,port,protocol,version) = lookup(options.registry, args[0])
-
+    print "X"
     
     env = {}
     for k  in  os.environ.keys():
         env[k] = os.environ[k]
 
     stdin = sys.stdin.read()
-    data = {'env':env, 'args':args, 'stdin':stdin }
+    data = {'env':env, 'args':sys.argv[1:], 'stdin':stdin }
     print "sending %s" % data
+
+    print "X"
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print host
@@ -46,25 +44,26 @@ def main():
     msg = json.dumps(data)
     msglen = len(data)
     totalsent = 0
+    print "X"
     while totalsent < msglen:
         print "sending"
         sent = s.send(msg[totalsent:])
         totalsent = totalsent + sent
     s.shutdown(1)
     print "recieveing"
-    response = ""
+    packets = ""
     while True:
         print "recieveing"
         packet = s.recv(1024)
         print "got %d" % len(packet)
         if len(packet):
-            response = response + packet
+            packets = packets + packet
         else:
             break
-
-    print response
+    response = json.loads(packets)
+    print response['stdout']
     s.close()
-
+    exit response['status']
 
 if __name__ == '__main__':
     main()
