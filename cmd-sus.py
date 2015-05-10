@@ -58,7 +58,7 @@ class MyTCPServerHandler(SocketServer.BaseRequestHandler):
 
 
 
-register("glugger", socket.gethostname(), 13373, "cmd", "0.0.1")
+register("ls", socket.gethostname(), 13373, "cmd", "0.0.1")
 
 server = MyTCPServer((socket.gethostname(), 13373), MyTCPServerHandler)
 server.serve_forever()
