@@ -4,6 +4,7 @@ import socket
 import json
 import subprocess
 import os
+import sys
 from optparse import OptionParser
 
 def lookup(registry, name):
@@ -29,11 +30,13 @@ def main():
     print args[0]
     (host,port,protocol,version) = lookup(options.registry, args[0])
 
+    
     env = {}
     for k  in  os.environ.keys():
         env[k] = os.environ[k]
-        
-    data = {'env':env, 'test':123.4}
+
+    stdin = sys.stdin.read()
+    data = {'env':env, 'args':args, 'stdin':stdin }
     print "sending %s" % data
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
