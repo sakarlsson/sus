@@ -63,7 +63,7 @@ def main():
     response = json.loads(packets)
     print response['stdout']
     s.close()
-    exit response['status']
+    sys.exit(response['status'])
 
 if __name__ == '__main__':
     main()
