@@ -22,7 +22,7 @@ def lookup(registry, name):
 
 def main():
     parser = OptionParser(__doc__)
-    parser.add_option("-r", "--registry", dest="registry", default="gotburh05p:6379",
+    parser.add_option("-r", "--registry", dest="registry", default="localhost:6379",
                       help="registry")
     (options, args) = parser.parse_args()
 
@@ -40,9 +40,26 @@ def main():
     print host
     print port 
     s.connect((host, port))
-    s.send(json.dumps(data))
-    result = json.loads(s.recv(1024))
-    print result
+    msg = json.dumps(data)
+    msglen = len(data)
+    totalsent = 0
+    while totalsent < msglen:
+        print "sending"
+        sent = s.send(msg[totalsent:])
+        totalsent = totalsent + sent
+    s.shutdown(1)
+    print "recieveing"
+    response = ""
+    while True:
+        print "recieveing"
+        packet = s.recv(1024)
+        print "got %d" % len(packet)
+        if len(packet):
+            response = response + packet
+        else:
+            break
+
+    print response
     s.close()
 
 

@@ -27,6 +27,7 @@ class MyTCPServerHandler(SocketServer.BaseRequestHandler):
         data = ""
         try:
             while True:
+                print "recieveing"
                 packet = self.request.recv(1024)
                 if len(packet):
                     data = data + packet
@@ -44,7 +45,7 @@ class MyTCPServerHandler(SocketServer.BaseRequestHandler):
         except Exception, e:
             print "Exception wile receiving message: ", e
 
-register("glugger", socket.gethostname(), 13373, "cmd", "1.0.0")
+register("glugger", socket.gethostname(), 13373, "cmd", "0.0.1")
 
 server = MyTCPServer((socket.gethostname(), 13373), MyTCPServerHandler)
 server.serve_forever()
