@@ -26,7 +26,11 @@ def main():
         use_stdin=True
     else:
         use_stdin=False
-    registry = os.environ['SUSREG']
+    If 'SUSREG' in os.environ:
+        registry = os.environ['SUSREG']
+    else:
+        registry = "gotburh05p.got.jeppesensystems.com:6379"
+        
     (host,port,protocol,version) = lookup(registry, args[1])
 
     env = {}
